@@ -49,7 +49,9 @@ The following reflects the current implementation in `src/components/FencingRemo
   - **CARD JAUNE** (left/right): increments yellow card count for the respective side.
 
 - **MATCH COUNT**
-  - Increments a simple counter displayed under the scoreboard.
+  - Manual press cycles: `0 → 1 → 2 → 3 → 0`.
+  - Starts disabled at `0`. While `0`, it does not auto-advance on pause completion.
+  - Once set manually to `1`, `2`, or `3`, pause completion auto-advances it in a cycle: `1 → 2 → 3 → 1`.
 
 ### Non-functional controls (placeholders)
 

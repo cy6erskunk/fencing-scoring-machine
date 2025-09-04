@@ -99,7 +99,8 @@ const FencingRemote: React.FC = () => {
             isPaused: false,
             isRunning: false,
             timeRemaining: 180,
-            matchCount: p.matchCount + 1
+            // Only auto-advance matchCount if enabled (>0). Cycle 1→2→3→1.
+            matchCount: p.matchCount > 0 ? (p.matchCount === 3 ? 1 : p.matchCount + 1) : 0
           }));
           return null;
         }
@@ -170,10 +171,12 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleMatchCount = () => {
-    setState(prev => ({
-      ...prev,
-      matchCount: prev.matchCount + 1
-    }));
+    setState(prev => {
+      const current = prev.matchCount;
+      // Manual cycle: 0 → 1 → 2 → 3 → 0
+      const next = current === 0 ? 1 : current === 3 ? 0 : current + 1;
+      return { ...prev, matchCount: next };
+    });
   };
 
   const Button: React.FC<{
