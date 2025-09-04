@@ -7,8 +7,8 @@ interface FencingState {
   timeRemaining: number; // in seconds
   isRunning: boolean;
   isPaused: boolean;
-  leftCards: { yellow: number; red: number };
-  rightCards: { yellow: number; red: number };
+  leftCards: { yellow: boolean; red: boolean };
+  rightCards: { yellow: boolean; red: boolean };
   matchCount: number;
 }
 
@@ -19,8 +19,8 @@ const FencingRemote: React.FC = () => {
     timeRemaining: 180, // 3 minutes
     isRunning: false,
     isPaused: false,
-    leftCards: { yellow: 0, red: 0 },
-    rightCards: { yellow: 0, red: 0 },
+    leftCards: { yellow: false, red: false },
+    rightCards: { yellow: false, red: false },
     matchCount: 0,
   });
 
@@ -165,7 +165,7 @@ const FencingRemote: React.FC = () => {
       ...prev,
       [side === 'left' ? 'leftCards' : 'rightCards']: {
         ...prev[side === 'left' ? 'leftCards' : 'rightCards'],
-        [type]: prev[side === 'left' ? 'leftCards' : 'rightCards'][type] + 1
+        [type]: !prev[side === 'left' ? 'leftCards' : 'rightCards'][type]
       }
     }));
   };
@@ -359,15 +359,9 @@ const FencingRemote: React.FC = () => {
           <div className="text-center">
             <div className="text-lg font-semibold mb-2">LEFT</div>
             <div className="text-6xl font-mono font-bold mb-4">{state.leftScore}</div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 bg-yellow-400 rounded-full"></div>
-                <span className="text-sm">{state.leftCards.yellow}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                <span className="text-sm">{state.leftCards.red}</span>
-              </div>
+            <div className="flex items-center justify-center gap-3">
+              <div className={`w-4 h-4 rounded-full ${state.leftCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
+              <div className={`w-4 h-4 rounded-full ${state.leftCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
             </div>
           </div>
 
@@ -375,15 +369,9 @@ const FencingRemote: React.FC = () => {
           <div className="text-center">
             <div className="text-lg font-semibold mb-2">RIGHT</div>
             <div className="text-6xl font-mono font-bold mb-4">{state.rightScore}</div>
-            <div className="space-y-1">
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 bg-yellow-400 rounded-full"></div>
-                <span className="text-sm">{state.rightCards.yellow}</span>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-4 h-4 bg-red-500 rounded-full"></div>
-                <span className="text-sm">{state.rightCards.red}</span>
-              </div>
+            <div className="flex items-center justify-center gap-3">
+              <div className={`w-4 h-4 rounded-full ${state.rightCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
+              <div className={`w-4 h-4 rounded-full ${state.rightCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
             </div>
           </div>
         </div>

@@ -45,8 +45,9 @@ The following reflects the current implementation in `src/components/FencingRemo
   - **MISE A ZERO**: resets both scores to 0.
 
 - **CARDS**
-  - **CARD ROUGE** (left/right): increments red card count for the respective side.
-  - **CARD JAUNE** (left/right): increments yellow card count for the respective side.
+  - **CARD ROUGE** (left/right): toggles red card on/off for the respective side.
+  - **CARD JAUNE** (left/right): toggles yellow card on/off for the respective side.
+  - The scoreboard shows an indicator light (colored when on, gray when off)
 
 - **MATCH COUNT**
   - Manual press cycles: `0 → 1 → 2 → 3 → 0`.
