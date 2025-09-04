@@ -10,6 +10,7 @@ interface FencingState {
   leftCards: { yellow: boolean; red: boolean };
   rightCards: { yellow: boolean; red: boolean };
   matchCount: number;
+  priority: 'none' | 'left' | 'right';
 }
 
 const FencingRemote: React.FC = () => {
@@ -22,6 +23,7 @@ const FencingRemote: React.FC = () => {
     leftCards: { yellow: false, red: false },
     rightCards: { yellow: false, red: false },
     matchCount: 0,
+    priority: 'none',
   });
 
   const [lastSetClick, setLastSetClick] = useState<number>(0);
@@ -179,6 +181,23 @@ const FencingRemote: React.FC = () => {
     });
   };
 
+  const handlePriorityManual = () => {
+    setState(prev => ({
+      ...prev,
+      priority: prev.priority === 'none' ? 'left' : prev.priority === 'left' ? 'right' : 'none'
+    }));
+  };
+
+  const handlePriorityRandom = () => {
+    setState(prev => {
+      if (prev.priority !== 'none') {
+        return { ...prev, priority: 'none' };
+      }
+      const assigned = Math.random() < 0.5 ? 'left' : 'right';
+      return { ...prev, priority: assigned };
+    });
+  };
+
   const Button: React.FC<{
     color: string;
     children: React.ReactNode;
@@ -293,7 +312,7 @@ const FencingRemote: React.FC = () => {
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
-            onClick={() => { }} // P MAN does nothing in this simulator
+            onClick={handlePriorityManual}
           >
             P<br />MAN
           </Button>
@@ -313,7 +332,7 @@ const FencingRemote: React.FC = () => {
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
-            onClick={() => { }} // P CAS does nothing in this simulator
+            onClick={handlePriorityRandom}
           >
             P<br />CAS
           </Button>
@@ -360,6 +379,12 @@ const FencingRemote: React.FC = () => {
             <div className="text-lg font-semibold mb-2">LEFT</div>
             <div className="text-6xl font-mono font-bold mb-4">{state.leftScore}</div>
             <div className="flex items-center justify-center gap-3">
+              <span
+                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'opacity-100' : 'opacity-0'}`}
+                aria-hidden={state.priority === 'left' ? 'false' : 'true'}
+              >
+                P
+              </span>
               <div className={`w-4 h-4 rounded-full ${state.leftCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
               <div className={`w-4 h-4 rounded-full ${state.leftCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
             </div>
@@ -372,6 +397,12 @@ const FencingRemote: React.FC = () => {
             <div className="flex items-center justify-center gap-3">
               <div className={`w-4 h-4 rounded-full ${state.rightCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
               <div className={`w-4 h-4 rounded-full ${state.rightCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
+              <span
+                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                aria-hidden={state.priority === 'right' ? 'false' : 'true'}
+              >
+                P
+              </span>
             </div>
           </div>
         </div>

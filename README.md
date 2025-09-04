@@ -49,6 +49,11 @@ The following reflects the current implementation in `src/components/FencingRemo
   - **CARD JAUNE** (left/right): toggles yellow card on/off for the respective side.
   - The scoreboard shows an indicator light (colored when on, gray when off)
 
+- **PRIORITY (P)**
+  - Display: a letter `P` appears next to the side that has priority.
+  - **P MAN**: manual cycle — none → left → right → none.
+  - **P CAS**: random assignment — if none, randomly assigns left or right; if already assigned, clears to none.
+
 - **MATCH COUNT**
   - Manual press cycles: `0 → 1 → 2 → 3 → 0`.
   - Starts disabled at `0`. While `0`, it does not auto-advance on pause completion.
@@ -59,9 +64,7 @@ The following reflects the current implementation in `src/components/FencingRemo
 These buttons are present for UI completeness but have no effect in this simulator:
 
 - `REARM`
-- `P MAN`
 - `BLOCK`
-- `P CAS`
 - `TELEC ACQUIS`
 
 ## Getting Started
