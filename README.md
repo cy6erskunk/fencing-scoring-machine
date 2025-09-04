@@ -30,8 +30,10 @@ The following reflects the current implementation in `src/components/FencingRemo
   - Toggles running state; also clears pause when starting.
 
 - **PAUSE 1MIN**
-  - Toggles pause only while running.
-  - Note: Despite the label, it does not set a 1‑minute countdown; it simply pauses/resumes.
+  - Starts a fixed 60-second pause (regardless of whether the match timer is running or stopped).
+  - During pause, the main clock shows the 60-second countdown and the status displays `PAUSE`.
+  - After 60 seconds: **Match Count** increments by 1, the match timer resets to 3:00, and remains stopped until `START` is pressed.
+  - Any scheduled pause is cancelled if time hits 0 or `SET` is pressed.
 
 - **SET**
   - Single click: sets time to 3:00 and stops the timer.

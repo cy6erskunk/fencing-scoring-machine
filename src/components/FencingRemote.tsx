@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Timer, RotateCcw, Play, Pause, Square } from 'lucide-react';
 
 interface FencingState {
@@ -25,11 +25,22 @@ const FencingRemote: React.FC = () => {
   });
 
   const [lastSetClick, setLastSetClick] = useState<number>(0);
+  const pauseIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [pauseRemaining, setPauseRemaining] = useState<number | null>(null);
+
+  const clearScheduledPause = () => {
+    if (pauseIntervalRef.current) {
+      clearInterval(pauseIntervalRef.current);
+      pauseIntervalRef.current = null;
+    }
+    setPauseRemaining(null);
+    setState(prev => ({ ...prev, isPaused: false }));
+  };
 
   // Timer effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (state.isRunning && !state.isPaused && state.timeRemaining > 0) {
       interval = setInterval(() => {
         setState(prev => ({
@@ -45,6 +56,7 @@ const FencingRemote: React.FC = () => {
   // Auto-stop when time reaches 0
   useEffect(() => {
     if (state.timeRemaining === 0 && state.isRunning) {
+      clearScheduledPause();
       setState(prev => ({ ...prev, isRunning: false, isPaused: false }));
     }
   }, [state.timeRemaining, state.isRunning]);
@@ -56,26 +68,50 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleStartStop = () => {
-    setState(prev => ({
-      ...prev,
-      isRunning: !prev.isRunning,
-      isPaused: false
-    }));
+    setState(prev => {
+      const nextRunning = !prev.isRunning;
+      if (!nextRunning) {
+        clearScheduledPause();
+      }
+      return {
+        ...prev,
+        isRunning: nextRunning,
+        isPaused: false
+      };
+    });
   };
 
   const handlePause = () => {
-    if (state.isRunning) {
-      setState(prev => ({
-        ...prev,
-        isPaused: !prev.isPaused
-      }));
-    }
+    // Start a fixed 60s pause regardless of running state
+    clearScheduledPause();
+    setState(prev => ({ ...prev, isPaused: true }));
+    setPauseRemaining(60);
+    pauseIntervalRef.current = setInterval(() => {
+      setPauseRemaining(prev => {
+        if (prev === null) return null;
+        if (prev <= 1) {
+          if (pauseIntervalRef.current) {
+            clearInterval(pauseIntervalRef.current);
+            pauseIntervalRef.current = null;
+          }
+          setState(p => ({
+            ...p,
+            isPaused: false,
+            isRunning: false,
+            timeRemaining: 180,
+            matchCount: p.matchCount + 1
+          }));
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const handleAddPoint = (side: 'left' | 'right') => {
     setState(prev => ({
       ...prev,
-      [side === 'left' ? 'leftScore' : 'rightScore']: 
+      [side === 'left' ? 'leftScore' : 'rightScore']:
         prev[side === 'left' ? 'leftScore' : 'rightScore'] + 1
     }));
   };
@@ -83,7 +119,7 @@ const FencingRemote: React.FC = () => {
   const handleRemovePoint = (side: 'left' | 'right') => {
     setState(prev => ({
       ...prev,
-      [side === 'left' ? 'leftScore' : 'rightScore']: 
+      [side === 'left' ? 'leftScore' : 'rightScore']:
         Math.max(0, prev[side === 'left' ? 'leftScore' : 'rightScore'] - 1)
     }));
   };
@@ -99,9 +135,10 @@ const FencingRemote: React.FC = () => {
   const handleSet = () => {
     const now = Date.now();
     const timeSinceLastClick = now - lastSetClick;
-    
+
     if (timeSinceLastClick < 500) { // Double click within 500ms
       // Set to 1 minute
+      clearScheduledPause();
       setState(prev => ({
         ...prev,
         timeRemaining: 60,
@@ -110,6 +147,7 @@ const FencingRemote: React.FC = () => {
       }));
     } else {
       // Single click - set to 3 minutes
+      clearScheduledPause();
       setState(prev => ({
         ...prev,
         timeRemaining: 180,
@@ -117,7 +155,7 @@ const FencingRemote: React.FC = () => {
         isPaused: false
       }));
     }
-    
+
     setLastSetClick(now);
   };
 
@@ -161,18 +199,18 @@ const FencingRemote: React.FC = () => {
     <div className="flex flex-row gap-8 items-center">
       {/* Remote Control */}
       <div className="bg-gray-800 p-6 rounded-lg shadow-2xl">
-        
+
         <div className="grid grid-cols-3 gap-3">
           {/* Row 1 */}
           <Button
             color="bg-green-500 hover:bg-green-400 text-white"
             onClick={handleStartStop}
           >
-            {state.isRunning ? 'STOP' : 'START'}
+            START STOP
           </Button>
           <Button
             color="bg-yellow-500 hover:bg-yellow-400 text-black"
-            onClick={() => {}} // Rearm does nothing
+            onClick={() => { }} // Rearm does nothing
           >
             REARM
           </Button>
@@ -180,7 +218,7 @@ const FencingRemote: React.FC = () => {
             color="bg-green-500 hover:bg-green-400 text-white"
             onClick={handlePause}
           >
-            PAUSE<br/>1MIN
+            PAUSE<br />1 MIN
           </Button>
 
           {/* Row 2 */}
@@ -194,7 +232,7 @@ const FencingRemote: React.FC = () => {
             color="bg-red-500 hover:bg-red-400 text-white"
             onClick={handleMiseAZero}
           >
-            MISE A<br/>ZERO
+            MISE A<br />ZERO
           </Button>
           <Button
             color="bg-red-500 hover:bg-red-400 text-white"
@@ -208,7 +246,7 @@ const FencingRemote: React.FC = () => {
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('left', 'red')}
           >
-            CARD<br/>ROUGE
+            CARD<br />ROUGE
           </Button>
           <Button
             color="bg-green-500 hover:bg-green-400 text-white"
@@ -220,7 +258,7 @@ const FencingRemote: React.FC = () => {
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('right', 'red')}
           >
-            CARD<br/>ROUGE
+            CARD<br />ROUGE
           </Button>
 
           {/* Row 4 */}
@@ -228,19 +266,19 @@ const FencingRemote: React.FC = () => {
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('left', 'yellow')}
           >
-            CARD<br/>JAUNE
+            CARD<br />JAUNE
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={handleMatchCount}
           >
-            MATCH<br/>COUNT
+            MATCH<br />COUNT
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('right', 'yellow')}
           >
-            CARD<br/>JAUNE
+            CARD<br />JAUNE
           </Button>
 
           {/* Row 5 */}
@@ -252,9 +290,9 @@ const FencingRemote: React.FC = () => {
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
-            onClick={() => {}} // P MAN does nothing in this simulator
+            onClick={() => { }} // P MAN does nothing in this simulator
           >
-            P<br/>MAN
+            P<br />MAN
           </Button>
           <Button
             color="bg-red-500 hover:bg-red-400 text-white"
@@ -266,21 +304,21 @@ const FencingRemote: React.FC = () => {
           {/* Row 6 */}
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
-            onClick={() => {}} // Block does nothing
+            onClick={() => { }} // Block does nothing
           >
             BLOCK
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
-            onClick={() => {}} // P CAS does nothing in this simulator
+            onClick={() => { }} // P CAS does nothing in this simulator
           >
-            P<br/>CAS
+            P<br />CAS
           </Button>
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
-            onClick={() => {}} // Telec acquis does nothing
+            onClick={() => { }} // Telec acquis does nothing
           >
-            TELEC<br/>ACQUIS
+            TELEC<br />ACQUIS
           </Button>
         </div>
 
@@ -291,20 +329,24 @@ const FencingRemote: React.FC = () => {
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold mb-2">FENCING SCORING</h1>
           <div className="text-4xl font-mono font-bold">
-            {formatTime(state.timeRemaining)}
+            {formatTime(pauseRemaining ?? state.timeRemaining)}
           </div>
           <div className="flex items-center justify-center gap-2 mt-2">
-            {state.isRunning && !state.isPaused && (
+            {state.isRunning && !state.isPaused && pauseRemaining === null && (
               <Play className="w-4 h-4 text-green-400" />
             )}
             {state.isPaused && (
               <Pause className="w-4 h-4 text-yellow-400" />
             )}
-            {!state.isRunning && (
+            {!state.isRunning && pauseRemaining === null && (
               <Square className="w-4 h-4 text-red-400" />
             )}
             <span className="text-sm">
-              {state.isRunning ? (state.isPaused ? 'PAUSED' : 'RUNNING') : 'STOPPED'}
+              {pauseRemaining !== null
+                ? 'PAUSE'
+                : state.isRunning
+                  ? (state.isPaused ? 'PAUSED' : 'RUNNING')
+                  : 'STOPPED'}
             </span>
           </div>
         </div>
