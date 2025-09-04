@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Timer, RotateCcw, Play, Pause, Square } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Play, Pause, Square } from 'lucide-react';
 
 interface FencingState {
   leftScore: number;
@@ -27,39 +27,43 @@ const FencingRemote: React.FC = () => {
   });
 
   const [lastSetClick, setLastSetClick] = useState<number>(0);
-  const pauseIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const pauseIntervalRef = useRef<number | null>(null);
   const [pauseRemaining, setPauseRemaining] = useState<number | null>(null);
 
   const clearScheduledPause = () => {
-    if (pauseIntervalRef.current) {
+    if (pauseIntervalRef.current !== null) {
       clearInterval(pauseIntervalRef.current);
       pauseIntervalRef.current = null;
     }
     setPauseRemaining(null);
-    setState(prev => ({ ...prev, isPaused: false }));
+    setState((prev: FencingState) => ({ ...prev, isPaused: false }));
   };
 
   // Timer effect
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: number | undefined;
 
     if (state.isRunning && !state.isPaused && state.timeRemaining > 0) {
-      interval = setInterval(() => {
-        setState(prev => ({
+      interval = window.setInterval(() => {
+        setState((prev: FencingState) => ({
           ...prev,
           timeRemaining: Math.max(0, prev.timeRemaining - 1)
         }));
       }, 1000);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      if (interval !== undefined) {
+        clearInterval(interval);
+      }
+    };
   }, [state.isRunning, state.isPaused, state.timeRemaining]);
 
   // Auto-stop when time reaches 0
   useEffect(() => {
     if (state.timeRemaining === 0 && state.isRunning) {
       clearScheduledPause();
-      setState(prev => ({ ...prev, isRunning: false, isPaused: false }));
+      setState((prev: FencingState) => ({ ...prev, isRunning: false, isPaused: false }));
     }
   }, [state.timeRemaining, state.isRunning]);
 
@@ -70,7 +74,7 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleStartStop = () => {
-    setState(prev => {
+    setState((prev: FencingState) => {
       const nextRunning = !prev.isRunning;
       if (!nextRunning) {
         clearScheduledPause();
@@ -86,17 +90,17 @@ const FencingRemote: React.FC = () => {
   const handlePause = () => {
     // Start a fixed 60s pause regardless of running state
     clearScheduledPause();
-    setState(prev => ({ ...prev, isPaused: true }));
+    setState((prev: FencingState) => ({ ...prev, isPaused: true }));
     setPauseRemaining(60);
-    pauseIntervalRef.current = setInterval(() => {
-      setPauseRemaining(prev => {
+    pauseIntervalRef.current = window.setInterval(() => {
+      setPauseRemaining((prev: number | null) => {
         if (prev === null) return null;
         if (prev <= 1) {
-          if (pauseIntervalRef.current) {
+          if (pauseIntervalRef.current !== null) {
             clearInterval(pauseIntervalRef.current);
             pauseIntervalRef.current = null;
           }
-          setState(p => ({
+          setState((p: FencingState) => ({
             ...p,
             isPaused: false,
             isRunning: false,
@@ -112,7 +116,7 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleAddPoint = (side: 'left' | 'right') => {
-    setState(prev => ({
+    setState((prev: FencingState) => ({
       ...prev,
       [side === 'left' ? 'leftScore' : 'rightScore']:
         prev[side === 'left' ? 'leftScore' : 'rightScore'] + 1
@@ -120,7 +124,7 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleRemovePoint = (side: 'left' | 'right') => {
-    setState(prev => ({
+    setState((prev: FencingState) => ({
       ...prev,
       [side === 'left' ? 'leftScore' : 'rightScore']:
         Math.max(0, prev[side === 'left' ? 'leftScore' : 'rightScore'] - 1)
@@ -128,7 +132,7 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleMiseAZero = () => {
-    setState(prev => ({
+    setState((prev: FencingState) => ({
       ...prev,
       leftScore: 0,
       rightScore: 0
@@ -142,7 +146,7 @@ const FencingRemote: React.FC = () => {
     if (timeSinceLastClick < 500) { // Double click within 500ms
       // Set to 1 minute
       clearScheduledPause();
-      setState(prev => ({
+      setState((prev: FencingState) => ({
         ...prev,
         timeRemaining: 60,
         isRunning: false,
@@ -151,7 +155,7 @@ const FencingRemote: React.FC = () => {
     } else {
       // Single click - set to 3 minutes
       clearScheduledPause();
-      setState(prev => ({
+      setState((prev: FencingState) => ({
         ...prev,
         timeRemaining: 180,
         isRunning: false,
@@ -163,7 +167,7 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleCard = (side: 'left' | 'right', type: 'yellow' | 'red') => {
-    setState(prev => ({
+    setState((prev: FencingState) => ({
       ...prev,
       [side === 'left' ? 'leftCards' : 'rightCards']: {
         ...prev[side === 'left' ? 'leftCards' : 'rightCards'],
@@ -173,7 +177,7 @@ const FencingRemote: React.FC = () => {
   };
 
   const handleMatchCount = () => {
-    setState(prev => {
+    setState((prev: FencingState) => {
       const current = prev.matchCount;
       // Manual cycle: 0 → 1 → 2 → 3 → 0
       const next = current === 0 ? 1 : current === 3 ? 0 : current + 1;
@@ -182,14 +186,14 @@ const FencingRemote: React.FC = () => {
   };
 
   const handlePriorityManual = () => {
-    setState(prev => ({
+    setState((prev: FencingState) => ({
       ...prev,
       priority: prev.priority === 'none' ? 'left' : prev.priority === 'left' ? 'right' : 'none'
     }));
   };
 
   const handlePriorityRandom = () => {
-    setState(prev => {
+    setState((prev: FencingState) => {
       if (prev.priority !== 'none') {
         return { ...prev, priority: 'none' };
       }
@@ -198,24 +202,27 @@ const FencingRemote: React.FC = () => {
     });
   };
 
-  const Button: React.FC<{
+  interface RemoteButtonProps {
     color: string;
     children: React.ReactNode;
     onClick: () => void;
     className?: string;
-  }> = ({ color, children, onClick, className = '' }) => (
-    <button
-      onClick={onClick}
-      className={`
-        w-16 h-16 rounded-full font-bold text-sm shadow-lg
-        transform transition-all duration-150 active:scale-95
-        hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50
-        ${color} ${className}
-      `}
-    >
-      {children}
-    </button>
-  );
+  }
+  function Button({ color, children, onClick, className = '' }: RemoteButtonProps) {
+    return (
+      <button
+        onClick={onClick}
+        className={`
+          w-16 h-16 rounded-full font-bold text-sm shadow-lg
+          transform transition-all duration-150 active:scale-95
+          hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50
+          ${color} ${className}
+        `}
+      >
+        {children}
+      </button>
+    );
+  }
 
   return (
     <div className="flex md:flex-row flex-col-reverse gap-8 items-center">
@@ -381,7 +388,6 @@ const FencingRemote: React.FC = () => {
             <div className="flex items-center justify-center gap-3">
               <span
                 className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'opacity-100' : 'opacity-0'}`}
-                aria-hidden={state.priority === 'left' ? 'false' : 'true'}
               >
                 P
               </span>
