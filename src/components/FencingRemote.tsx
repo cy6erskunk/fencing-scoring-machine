@@ -218,7 +218,7 @@ const FencingRemote: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-row gap-8 items-center">
+    <div className="flex md:flex-row flex-col-reverse gap-8 items-center">
       {/* Remote Control */}
       <div className="bg-gray-800 p-6 rounded-lg shadow-2xl">
 
