@@ -380,7 +380,7 @@ const FencingRemote: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-3 gap-8">
           {/* Left Fencer */}
           <div className="text-center">
             <div className="text-lg font-semibold mb-2">LEFT</div>
@@ -393,6 +393,18 @@ const FencingRemote: React.FC = () => {
               </span>
               <div className={`w-4 h-4 rounded-full ${state.leftCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
               <div className={`w-4 h-4 rounded-full ${state.leftCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
+            </div>
+          </div>
+
+          {/* Match Count Indicators (Center Column) */}
+          <div className="flex items-center justify-center">
+            <div className="flex flex-col items-center gap-2">
+              {[3, 2, 1].map((round) => (
+                <div
+                  key={round}
+                  className={`w-4 h-4 rounded-full ${state.matchCount > 0 && state.matchCount >= round ? 'bg-yellow-300' : 'bg-gray-600'}`}
+                ></div>
+              ))}
             </div>
           </div>
 
@@ -411,11 +423,6 @@ const FencingRemote: React.FC = () => {
               </span>
             </div>
           </div>
-        </div>
-
-        <div className="text-center mt-6 pt-4 border-t border-gray-600">
-          <div className="text-sm text-gray-400">Match Count</div>
-          <div className="text-2xl font-bold">{state.matchCount}</div>
         </div>
       </div>
     </div>
