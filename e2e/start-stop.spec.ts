@@ -37,8 +37,7 @@ test('timer runs down to 0 and auto-stops', async ({ page }) => {
     // Advance timers by 60s and verify auto-stop
     // Some environments require running timers rather than just jumping time.
     // runFor executes timer callbacks due within the given duration.
-    // @ts-ignore - runFor is available at runtime
-    await page.clock.runFor?.(60_000) ?? await page.clock.fastForward(60_000);
+    void (await page.clock.runFor?.(60_000) ?? await page.clock.fastForward(60_000));
     await expect(page.getByText('0:00')).toBeVisible();
     await expect(page.getByText('STOPPED')).toBeVisible();
 });
