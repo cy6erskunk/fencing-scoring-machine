@@ -106,6 +106,47 @@ npm run preview
 npm run lint
 ```
 
+## End-to-End Tests (Playwright)
+
+### Run tests
+
+```bash
+# All tests across Chromium, Firefox, WebKit
+npx playwright test
+
+# Single spec
+npx playwright test e2e/start-stop.spec.ts
+```
+
+The test runner starts the Vite dev server automatically (see `playwright.config.ts`).
+
+### Selector strategy (accessible-first)
+
+Tests use accessible locators to mirror real user interactions and improve reliability:
+- Buttons via role/name: `getByRole('button', { name: 'left yellow card' })`.
+- Status via stable label: the status element has `aria-label="status"`; assert its text with `getByLabel('status')` and `toHaveText(...)`.
+- Buttons may expose `aria-pressed` for state.
+
+This reduces brittleness compared to text or class-based selectors and makes tests self-documenting.
+
+### Time control with fake timers
+
+To make timing deterministic and fast, tests use Playwright's fake timers:
+
+```ts
+await page.clock.install();
+// ... actions ...
+// Advance virtual time so setInterval/setTimeout callbacks run
+await page.clock.runFor?.(60_000) ?? await page.clock.fastForward(60_000);
+```
+
+- The fake clock is scoped to the current test's page and resets between tests.
+- Use `await page.clock.uninstall()` within a test if you need to return to real time.
+
+### Cross-browser
+
+All specs run on Chromium, Firefox, and WebKit in CI-equivalent conditions. Prefer accessible selectors and fake timers to avoid flakiness across engines.
+
 ## Tech Stack
 
 - **React 18** (`react`, `react-dom`)
