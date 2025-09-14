@@ -403,6 +403,8 @@ const FencingRemote: React.FC = () => {
             <div className="flex items-center justify-center gap-3">
               <span
                 className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'opacity-100' : 'opacity-0'}`}
+                aria-label="priority left"
+                aria-hidden={state.priority === 'left' ? 'false' : 'true'}
               >
                 P
               </span>
@@ -444,6 +446,7 @@ const FencingRemote: React.FC = () => {
               ></div>
               <span
                 className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                aria-label="priority right"
                 aria-hidden={state.priority === 'right' ? 'false' : 'true'}
               >
                 P
