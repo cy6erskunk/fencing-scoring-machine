@@ -4,16 +4,19 @@ test('start/stop toggles between STOPPED and RUNNING', async ({ page }) => {
     await page.clock.install();
     await page.goto('/');
 
+    const startStopBtn = page.getByRole('button', { name: 'START STOP' });
+    const statusText = page.getByLabel('status');
+
     // Initially STOPPED
-    await expect(page.getByText('STOPPED')).toBeVisible();
+    await expect(statusText).toHaveText('STOPPED');
 
     // Click START STOP -> RUNNING
-    await page.getByRole('button', { name: 'START STOP' }).click();
-    await expect(page.getByText('RUNNING')).toBeVisible();
+    await startStopBtn.click();
+    await expect(statusText).toHaveText('RUNNING'); // running state shows RUNNING (or PAUSED briefly if other actions intervene)
 
     // Click START STOP again -> STOPPED
-    await page.getByRole('button', { name: 'START STOP' }).click();
-    await expect(page.getByText('STOPPED')).toBeVisible();
+    await startStopBtn.click();
+    await expect(statusText).toHaveText('STOPPED');
 });
 
 

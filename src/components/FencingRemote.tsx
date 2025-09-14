@@ -382,7 +382,10 @@ const FencingRemote: React.FC = () => {
             {!state.isRunning && pauseRemaining === null && (
               <Square className="w-4 h-4 text-red-400" />
             )}
-            <span className="text-sm">
+            <span
+              className="text-sm"
+              aria-label="status"
+            >
               {pauseRemaining !== null
                 ? 'PAUSE'
                 : state.isRunning
