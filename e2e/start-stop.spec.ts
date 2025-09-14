@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('start/stop toggles between STOPPED and RUNNING', async ({ page }) => {
+    await page.clock.install();
     await page.goto('/');
 
     // Initially STOPPED
