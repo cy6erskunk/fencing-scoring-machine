@@ -402,7 +402,7 @@ const FencingRemote: React.FC = () => {
             <div className="text-6xl font-mono font-bold mb-4">{state.leftScore}</div>
             <div className="flex items-center justify-center gap-3">
               <span
-                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'opacity-100' : 'opacity-0'}`}
+                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'visible' : 'invisible'}`}
                 aria-label="priority left"
                 aria-hidden={state.priority === 'left' ? 'false' : 'true'}
               >
@@ -445,7 +445,7 @@ const FencingRemote: React.FC = () => {
                 aria-label={`right red card ${state.rightCards.red ? 'on' : 'off'}`}
               ></div>
               <span
-                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'right' ? 'visible' : 'invisible'}`}
                 aria-label="priority right"
                 aria-hidden={state.priority === 'right' ? 'false' : 'true'}
               >
