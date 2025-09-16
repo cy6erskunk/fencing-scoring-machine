@@ -207,8 +207,10 @@ const FencingRemote: React.FC = () => {
     children: React.ReactNode;
     onClick: () => void;
     className?: string;
+    ariaLabel?: string;
+    ariaPressed?: boolean;
   }
-  function Button({ color, children, onClick, className = '' }: RemoteButtonProps) {
+  function Button({ color, children, onClick, className = '', ariaLabel, ariaPressed }: RemoteButtonProps) {
     return (
       <button
         onClick={onClick}
@@ -218,6 +220,8 @@ const FencingRemote: React.FC = () => {
           hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-white/50
           ${color} ${className}
         `}
+        aria-label={ariaLabel}
+        aria-pressed={ariaPressed}
       >
         {children}
       </button>
@@ -274,6 +278,8 @@ const FencingRemote: React.FC = () => {
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('left', 'red')}
+            ariaLabel="left red card"
+            ariaPressed={state.leftCards.red}
           >
             CARD<br />ROUGE
           </Button>
@@ -286,6 +292,8 @@ const FencingRemote: React.FC = () => {
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('right', 'red')}
+            ariaLabel="right red card"
+            ariaPressed={state.rightCards.red}
           >
             CARD<br />ROUGE
           </Button>
@@ -294,6 +302,8 @@ const FencingRemote: React.FC = () => {
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('left', 'yellow')}
+            ariaLabel="left yellow card"
+            ariaPressed={state.leftCards.yellow}
           >
             CARD<br />JAUNE
           </Button>
@@ -306,6 +316,8 @@ const FencingRemote: React.FC = () => {
           <Button
             color="bg-purple-500 hover:bg-purple-400 text-white"
             onClick={() => handleCard('right', 'yellow')}
+            ariaLabel="right yellow card"
+            ariaPressed={state.rightCards.yellow}
           >
             CARD<br />JAUNE
           </Button>
@@ -370,7 +382,10 @@ const FencingRemote: React.FC = () => {
             {!state.isRunning && pauseRemaining === null && (
               <Square className="w-4 h-4 text-red-400" />
             )}
-            <span className="text-sm">
+            <span
+              className="text-sm"
+              aria-label="status"
+            >
               {pauseRemaining !== null
                 ? 'PAUSE'
                 : state.isRunning
@@ -387,12 +402,20 @@ const FencingRemote: React.FC = () => {
             <div className="text-6xl font-mono font-bold mb-4">{state.leftScore}</div>
             <div className="flex items-center justify-center gap-3">
               <span
-                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'opacity-100' : 'opacity-0'}`}
+                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'left' ? 'visible' : 'invisible'}`}
+                aria-label="priority left"
+                aria-hidden={state.priority === 'left' ? 'false' : 'true'}
               >
                 P
               </span>
-              <div className={`w-4 h-4 rounded-full ${state.leftCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
-              <div className={`w-4 h-4 rounded-full ${state.leftCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
+              <div
+                className={`w-4 h-4 rounded-full ${state.leftCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}
+                aria-label={`left yellow card ${state.leftCards.yellow ? 'on' : 'off'}`}
+              ></div>
+              <div
+                className={`w-4 h-4 rounded-full ${state.leftCards.red ? 'bg-red-500' : 'bg-gray-600'}`}
+                aria-label={`left red card ${state.leftCards.red ? 'on' : 'off'}`}
+              ></div>
             </div>
           </div>
 
@@ -413,10 +436,17 @@ const FencingRemote: React.FC = () => {
             <div className="text-lg font-semibold mb-2">RIGHT</div>
             <div className="text-6xl font-mono font-bold mb-4">{state.rightScore}</div>
             <div className="flex items-center justify-center gap-3">
-              <div className={`w-4 h-4 rounded-full ${state.rightCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}></div>
-              <div className={`w-4 h-4 rounded-full ${state.rightCards.red ? 'bg-red-500' : 'bg-gray-600'}`}></div>
+              <div
+                className={`w-4 h-4 rounded-full ${state.rightCards.yellow ? 'bg-yellow-400' : 'bg-gray-600'}`}
+                aria-label={`right yellow card ${state.rightCards.yellow ? 'on' : 'off'}`}
+              ></div>
+              <div
+                className={`w-4 h-4 rounded-full ${state.rightCards.red ? 'bg-red-500' : 'bg-gray-600'}`}
+                aria-label={`right red card ${state.rightCards.red ? 'on' : 'off'}`}
+              ></div>
               <span
-                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'right' ? 'opacity-100' : 'opacity-0'}`}
+                className={`inline-block w-4 text-sm font-bold text-yellow-300 text-center ${state.priority === 'right' ? 'visible' : 'invisible'}`}
+                aria-label="priority right"
                 aria-hidden={state.priority === 'right' ? 'false' : 'true'}
               >
                 P
