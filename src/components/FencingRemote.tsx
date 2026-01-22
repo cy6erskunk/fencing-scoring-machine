@@ -76,18 +76,20 @@ const tutorialScenarios: TutorialScenario[] = [
   },
 ];
 
+const DEFAULT_STATE: FencingState = {
+  leftScore: 0,
+  rightScore: 0,
+  timeRemaining: 180, // 3 minutes
+  isRunning: false,
+  isPaused: false,
+  leftCards: { yellow: false, red: false },
+  rightCards: { yellow: false, red: false },
+  matchCount: 0,
+  priority: 'none',
+};
+
 const FencingRemote: React.FC = () => {
-  const [state, setState] = useState<FencingState>({
-    leftScore: 0,
-    rightScore: 0,
-    timeRemaining: 180, // 3 minutes
-    isRunning: false,
-    isPaused: false,
-    leftCards: { yellow: false, red: false },
-    rightCards: { yellow: false, red: false },
-    matchCount: 0,
-    priority: 'none',
-  });
+  const [state, setState] = useState<FencingState>(DEFAULT_STATE);
 
   const [tutorialMode, setTutorialMode] = useState(false);
   const [currentScenario, setCurrentScenario] = useState<TutorialScenario | null>(null);
@@ -126,17 +128,7 @@ const FencingRemote: React.FC = () => {
     setCurrentScenario(null);
     setCompletedSteps(new Set());
     // Reset to default state
-    setState({
-      leftScore: 0,
-      rightScore: 0,
-      timeRemaining: 180,
-      isRunning: false,
-      isPaused: false,
-      leftCards: { yellow: false, red: false },
-      rightCards: { yellow: false, red: false },
-      matchCount: 0,
-      priority: 'none',
-    });
+    setState(DEFAULT_STATE);
   };
 
   const clearScheduledPause = () => {

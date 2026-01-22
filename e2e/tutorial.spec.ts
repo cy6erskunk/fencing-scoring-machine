@@ -96,7 +96,7 @@ test('tutorial tracks step completion independently', async ({ page }) => {
 
     // Verify step 2 is marked complete but step 1 is not
     // We check for the presence of checkmarks in the steps
-    const stepsContainer = page.locator('text=Steps:').locator('..');
+    const stepsContainer = page.locator('text=STEPS:').locator('..');
     await expect(stepsContainer.getByText('✓').first()).toBeVisible();
 
     // Now complete step 1
