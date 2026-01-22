@@ -28,21 +28,6 @@ interface TutorialScenario {
   steps: TutorialStep[];
 }
 
-interface TutorialStep {
-  id: string;
-  description: string;
-  checkCompleted: (state: FencingState) => boolean;
-}
-
-interface TutorialScenario {
-  id: string;
-  name: string;
-  description: string;
-  initialState: Partial<FencingState>;
-  task: string;
-  steps: TutorialStep[];
-}
-
 // Tutorial scenarios
 const tutorialScenarios: TutorialScenario[] = [
   {
