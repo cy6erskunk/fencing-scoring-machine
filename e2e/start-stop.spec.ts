@@ -30,7 +30,7 @@ test('timer runs down to 0 and auto-stops', async ({ page }) => {
     await expect(page.getByText('STOPPED')).toBeVisible();
 
     // Set to 1 minute by double-clicking SET
-    const setButton = page.getByRole('button', { name: 'SET' });
+    const setButton = page.getByRole('button', { name: 'SET', exact: true });
     await setButton.click();
     await setButton.dblclick();
     await expect(page.getByText('1:00')).toBeVisible();
